@@ -1,9 +1,32 @@
 import { useState } from "react";
 import Container from "../components/Container";
 import { X, Clock } from "lucide-react";
+import { useEffect } from "react";
 
 const Home = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [playlists, setPlaylists] = useState([]);
+
+    useEffect(() => {
+        const fetchPlaylists = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/api/v1/playlist", {
+                    method: "GET",
+                });
+
+                const result = await res.json();
+
+                if (result.status) {
+                    setPlaylists(result.playlists);
+                    console.log(result.playlists);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchPlaylists();
+    }, []);
 
     return (
         <div className="w-full min-h-screen bg-gray-950 text-orange-200">
@@ -29,42 +52,53 @@ const Home = () => {
 
                 {/* playlist container   */}
                 <div className="flex items-center gap-2 px-5 w-full">
-                    <div className="max-w-2xs w-full h-54 rounded-2xl border-white/10 bg-linear-to-t from-white/15 to-black/15 backdrop-blur px-5 pt-7">
-                        <div className="flex items-center gap-2 ">
+                    {playlists.length > 0 &&
+                        playlists.map((playlist) => (
                             <div
-                                className="flex h-8 w-8 items-center justify-center rounded-lg
+                                key={playlist.id}
+                                className="max-w-2xs w-full h-54 rounded-2xl border-white/10 bg-linear-to-t from-white/15 to-black/15 backdrop-blur px-5 pt-7"
+                            >
+                                <div className="flex items-center gap-2 ">
+                                    <div
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg
                 bg-orange-400/20 text-orange-400"
-                            >
-                                <p className="font-semibold">W</p>
+                                    >
+                                        <p className="font-semibold uppercase">
+                                            {playlist.title[0]}
+                                        </p>
+                                    </div>
+
+                                    <h4 className="font-medium text-white">{playlist.title}</h4>
+                                </div>
+
+                                <p className="font-medium text-gray-400 mt-4">
+                                    <span className="text-2xl text-white">
+                                        {playlist.contentDetails}
+                                    </span>{" "}
+                                    Videos
+                                </p>
+
+                                <div className="w-full h-2 bg-gray-500 rounded-xl mt-1"></div>
+
+                                <div>
+                                    <p className="text-gray-400 text-xs mt-3">
+                                        Earn Badges after finish playlist
+                                    </p>
+
+                                    <div
+                                        onClick={() => setIsOpen(true)}
+                                        className="mt-1 w-14 h-14 rounded-xl overflow-hidden cursor-pointer"
+                                    >
+                                        <img
+                                            src="./levelupBadge.png"
+                                            alt="levelUp"
+                                            className="w-full h-full object-cover"
+                                            draggable={false}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-
-                            <h4 className="font-medium text-white">Watch Later</h4>
-                        </div>
-
-                        <p className="font-medium text-gray-400 mt-4">
-                            <span className="text-2xl text-white">3</span> Videos
-                        </p>
-
-                        <div className="w-full h-2 bg-gray-500 rounded-xl mt-1"></div>
-
-                        <div>
-                            <p className="text-gray-400 text-xs mt-3">
-                                Earn Badges after finish playlist
-                            </p>
-
-                            <div
-                                onClick={() => setIsOpen(true)}
-                                className="mt-1 w-14 h-14 rounded-xl overflow-hidden cursor-pointer"
-                            >
-                                <img
-                                    src="./levelupBadge.png"
-                                    alt="levelUp"
-                                    className="w-full h-full object-cover"
-                                    draggable={false}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                        ))}
                 </div>
 
                 <div className="flex items-center mt-10 px-5 gap-2">
