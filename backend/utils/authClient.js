@@ -1,14 +1,23 @@
-import "dotenv/config"
+import "dotenv/config";
 import { google } from "googleapis";
 
-export const oauth2Client = new google.auth.OAuth2({
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    redirect_uris: [process.env.REDIRECT_URI],
-});
+export const oauth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URI
+);
 
+export const getYoutubeClient = (refreshToken) => {
+    if (!refreshToken) {
+        throw new Error("Missing refresh token");
+    }
 
-export const youtube = google.youtube({
-    version: "v3",
-    auth: oauth2Client,
-});
+    oauth2Client.setCredentials({
+        refresh_token: refreshToken,
+    });
+
+    return google.youtube({
+        version: "v3",
+        auth: oauth2Client,
+    });
+};

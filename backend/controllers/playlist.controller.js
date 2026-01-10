@@ -1,15 +1,18 @@
-import { youtube } from "../utils/authClient.js";
+import { getYoutubeClient } from "../utils/authClient.js";
 
 export const getAllPlaylists = async (req, res) => {
     try {
         let playlists = [];
         let nextPageToken = null;
 
+        const youtube = getYoutubeClient(req.user?.youtubeRefreshToken)
+
         const response = await youtube.playlists.list({
             part: ["snippet", "contentDetails"],
             maxResults: 50,
             mine: true,
             pageToken: nextPageToken || undefined,
+            playlistId: "WL",
         });
 
         const items = response.data.items || [];
@@ -27,7 +30,7 @@ export const getAllPlaylists = async (req, res) => {
         }
 
         console.log("yeye");
-        console.log(playlists)
+        console.log(playlists);
 
         return res.status(200).json({
             message: "Playlists fetch successfully",

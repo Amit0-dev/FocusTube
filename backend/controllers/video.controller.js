@@ -1,4 +1,4 @@
-import { youtube } from "../utils/authClient.js";
+import { getYoutubeClient } from "../utils/authClient.js";
 
 export const getAllPlaylistVideos = async (req, res) => {
     try {
@@ -12,6 +12,8 @@ export const getAllPlaylistVideos = async (req, res) => {
         let nextPageToken = null;
 
         do {
+            const youtube = getYoutubeClient(req.user?.youtubeRefreshToken);
+
             const res = await youtube.playlistItems.list({
                 part: ["snippet", "contentDetails"],
                 playlistId,
@@ -43,7 +45,7 @@ export const getAllPlaylistVideos = async (req, res) => {
     } catch (error) {
         return res.status(400).json({
             message: "Failed to fetch videos",
-             status: false,
+            status: false,
             video: null,
         });
     }

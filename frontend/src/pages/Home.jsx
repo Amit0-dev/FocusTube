@@ -12,6 +12,7 @@ const Home = () => {
             try {
                 const res = await fetch("http://localhost:8080/api/v1/playlist", {
                     method: "GET",
+                    credentials: "include"
                 });
 
                 const result = await res.json();
